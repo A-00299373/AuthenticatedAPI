@@ -32,17 +32,17 @@ public class ProductController : ControllerBase
     public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategory(int categoryId)
     {
         // Retrieve the category from the database
-        var category = await _context.Categories
-            .Include(c => c.Products)
-            .FirstOrDefaultAsync(c => c.Id == categoryId);
+        // 
+         var products = await _context.Products
+                .Where(p => p.Category.Id == categoryId)
+                .ToListAsync();
 
-        if (category == null)
-        {
-            return NotFound("Category not found");
-        }
+            if (products == null || products.Count == 0)
+            {
+                return NotFound("No products found for this category");
+            }
 
-        // Return the products associated with the category
-        return Ok(category.Products);
+            return Ok(products);
     }
 
     // POST: /Product
@@ -56,7 +56,9 @@ public class ProductController : ControllerBase
                 await _context.SaveChangesAsync();
                 
                 // Return the newly created product with a 201 Created status code
-                return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+                // return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+                        return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+
             }
             else
             {
