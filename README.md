@@ -21,3 +21,5 @@ but when i try to find the product by the Id it was showing me below output even
     "category": null
   }
 ]
+
+I have tried by removing question mark in this field( public Category Category { get; set; } ) but still i am not able to understand why it is throwing that category is null.
