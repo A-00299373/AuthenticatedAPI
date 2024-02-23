@@ -8,8 +8,8 @@ using ShoppingCartLibrary;
 namespace ShoppingCartAPI.Controllers;
 
 [Authorize]
-    [Route("[controller]")]
-    [ApiController]
+[Route("[controller]")]
+[ApiController]
     public class ShoppingCartController : ControllerBase
     {
         private readonly AppDataContext _context;
@@ -20,77 +20,71 @@ namespace ShoppingCartAPI.Controllers;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ShoppingCart>>> GetShoppingCarts()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsInUserCart()
         {
-            // Retrieve all shopping carts from the database
-            var shoppingCarts = await _context.ShoppingCarts.ToListAsync();
-            return Ok(shoppingCarts);
-        }
-
-        [HttpGet("{user}")]
-        public async Task<ActionResult<ShoppingCart>> GetUserShoppingCart(string user)
-        {
-            // Retrieve the shopping cart for the specified user from the database
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var shoppingCart = await _context.ShoppingCarts
                 .Include(sc => sc.Products)
-                .FirstOrDefaultAsync(sc => sc.User == user);
+                .FirstOrDefaultAsync(sc => sc.User == userEmail);
 
             if (shoppingCart == null)
             {
-                return NotFound();
+                return NotFound("Shopping cart not found for the current user.");
             }
 
-            return shoppingCart;
+            return Ok(shoppingCart.Products);
         }
 
-        [HttpPost("RemoveItem/{cartId}/{productId}")]
-        public async Task<IActionResult> RemoveItem(int cartId, int productId)
+        [HttpPost("RemoveItem/{productId}")]
+        public async Task<IActionResult> RemoveItemFromCart(int productId)
         {
-            // Retrieve the shopping cart from the database
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var shoppingCart = await _context.ShoppingCarts
                 .Include(sc => sc.Products)
-                .FirstOrDefaultAsync(sc => sc.Id == cartId);
+                .FirstOrDefaultAsync(sc => sc.User == userEmail);
 
             if (shoppingCart == null)
             {
-                return NotFound();
+                return NotFound("Shopping cart not found for the current user.");
             }
 
-            // Remove the product from the shopping cart
             var productToRemove = shoppingCart.Products.FirstOrDefault(p => p.Id == productId);
             if (productToRemove != null)
             {
                 shoppingCart.Products.Remove(productToRemove);
                 await _context.SaveChangesAsync();
+                return Ok("Item removed from the shopping cart.");
             }
 
-            return Ok();
+            return NotFound("Product not found in the shopping cart.");
         }
 
-        [HttpPost("AddItem/{cartId}/{productId}")]
-        public async Task<IActionResult> AddItem(int cartId, int productId)
+        [HttpPost("AddItem/{productId}")]
+        public async Task<IActionResult> AddItemToCart(int productId)
         {
-            // Retrieve the shopping cart from the database
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var shoppingCart = await _context.ShoppingCarts
                 .Include(sc => sc.Products)
-                .FirstOrDefaultAsync(sc => sc.Id == cartId);
+                .FirstOrDefaultAsync(sc => sc.User == userEmail);
 
             if (shoppingCart == null)
             {
-                return NotFound();
+                shoppingCart = new ShoppingCart
+                {
+                    User = userEmail,
+                    Products = new List<Product>()
+                };
+                _context.ShoppingCarts.Add(shoppingCart);
             }
 
-            // Retrieve the product from the database
             var productToAdd = await _context.Products.FindAsync(productId);
             if (productToAdd == null)
             {
-                return NotFound("Product not found");
+                return NotFound("Product not found.");
             }
 
-            // Add the product to the shopping cart
             shoppingCart.Products.Add(productToAdd);
             await _context.SaveChangesAsync();
-
-            return Ok();
+            return Ok("Item added to the shopping cart.");
         }
     }
