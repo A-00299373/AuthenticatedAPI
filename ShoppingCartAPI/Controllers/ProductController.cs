@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShoppingCartAPI.Data;
 using ShoppingCartLibrary;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace ShoppingCartAPI.Controllers;
 
-[Authorize]
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
