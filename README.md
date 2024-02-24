@@ -23,3 +23,5 @@ but when i try to find the product by the Id it was showing me below output even
 ]
 
 I have tried by removing question mark in this field( public Category Category { get; set; } ) but still i am not able to understand why it is throwing that category is null.
+
+I have also tried by making the Category field required ("public required Category Category { get; set; }") but still facing the same issue.
