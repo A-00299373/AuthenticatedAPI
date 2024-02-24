@@ -25,6 +25,7 @@ namespace ShoppingCartAPI.Controllers;
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var shoppingCart = await _context.ShoppingCarts
                 .Include(sc => sc.Products)
+                .ThenInclude(p => p.Category)
                 .FirstOrDefaultAsync(sc => sc.User == userEmail);
 
             if (shoppingCart == null)

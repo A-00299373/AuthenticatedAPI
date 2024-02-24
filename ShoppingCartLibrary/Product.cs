@@ -7,5 +7,7 @@ public class Product
         public string Name { get; set; } = String.Empty;
         public string Description { get; set; } 
 
+        public int CategoryId { get; set; }
+        
         public Category Category { get; set; } 
     }
