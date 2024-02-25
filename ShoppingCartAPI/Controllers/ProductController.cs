@@ -25,7 +25,10 @@ namespace ShoppingCartAPI.Controllers;
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
         {
-            var products = await _context.Products.ToListAsync();
+            var products = await _context.Products
+            .Include(p => p.Category)
+            .ToListAsync();
+
             return Ok(products);
         }
 
@@ -34,7 +37,8 @@ namespace ShoppingCartAPI.Controllers;
         public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategory(int categoryId)
         {
             var products = await _context.Products
-                .Where(p => p.Category.Id == categoryId)
+                .Where(p => p.Category.categoryid == categoryId)
+                .Include(p => p.Category)
                 .ToListAsync();
 
             if (products == null || !products.Any())

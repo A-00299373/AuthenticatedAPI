@@ -66,9 +66,9 @@ public class ProductControllerTests
             var categoryId = 1; // Specify a category ID
             var products = new List<Product>
         {
-            new Product { Id = 1, Name = "Product 1", Price = 1, Description = "hello1", Category = new Category { Id = categoryId } },
-            new Product { Id = 2, Name = "Product 2", Price = 2, Description = "hello2", Category = new Category { Id = categoryId } },
-            new Product { Id = 3, Name = "Product 3", Price = 3, Description = "hello3", Category = new Category { Id = categoryId } }
+            new Product { Id = 1, Name = "Product 1", Price = 1, Description = "hello1", Category = new Category { categoryid = categoryId } },
+            new Product { Id = 2, Name = "Product 2", Price = 2, Description = "hello2", Category = new Category { categoryid = categoryId } },
+            new Product { Id = 3, Name = "Product 3", Price = 3, Description = "hello3", Category = new Category { categoryid = categoryId } }
         };
 
             dbContext.Products.AddRange(products);
